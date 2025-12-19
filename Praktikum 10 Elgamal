@@ -1,0 +1,92 @@
+# ----------------------------------
+# Fungsi Perpangkatan Modular
+# ----------------------------------
+def mod_exp(base, exp, mod):
+    hasil = 1
+    langkah = []
+
+    while exp > 0:
+        if exp % 2 == 1:
+            hasil = (hasil * base) % mod
+            langkah.append(f"hasil = (hasil × {base}) mod {mod} = {hasil}")
+        base = (base * base) % mod
+        langkah.append(f"base = base² mod {mod} = {base}")
+        exp //= 2
+
+    return hasil, langkah
+
+
+# ----------------------------------
+# INPUT MANUAL
+# ----------------------------------
+print("=== INPUT PARAMETER ELGAMAL ===")
+p = int(input("Masukkan nilai p (prima): "))
+g = int(input("Masukkan nilai g (generator): "))
+x = int(input("Masukkan nilai x (kunci privat): "))
+k = int(input("Masukkan nilai k (bilangan acak): "))
+m = int(input("Masukkan pesan m (< p): "))
+
+# ----------------------------------
+# PEMBANGKITAN KUNCI PUBLIK
+# y = g^x mod p
+# ----------------------------------
+print("\n=== PEMBANGKITAN KUNCI PUBLIK ===")
+y, langkah_y = mod_exp(g, x, p)
+
+print(f"y = g^x mod p = {g}^{x} mod {p}")
+for l in langkah_y:
+    print("  ", l)
+print("Kunci Publik y =", y)
+
+# ----------------------------------
+# ENKRIPSI
+# ----------------------------------
+print("\n=== PROSES ENKRIPSI ===")
+
+# a = g^k mod p
+a, langkah_a = mod_exp(g, k, p)
+print(f"\na = g^k mod p = {g}^{k} mod {p}")
+for l in langkah_a:
+    print("  ", l)
+print("Nilai a =", a)
+
+# y^k mod p
+yk, langkah_yk = mod_exp(y, k, p)
+print(f"\ny^k mod p = {y}^{k} mod {p}")
+for l in langkah_yk:
+    print("  ", l)
+
+# b = m × y^k mod p
+b = (m * yk) % p
+print(f"\nb = m × y^k mod p")
+print(f"b = {m} × {yk} mod {p} = {b}")
+
+print("\nCiphertext (a, b) =", (a, b))
+
+# ----------------------------------
+# DEKRIPSI
+# ----------------------------------
+print("\n=== PROSES DEKRIPSI ===")
+
+# s = a^x mod p
+s, langkah_s = mod_exp(a, x, p)
+print(f"\ns = a^x mod p = {a}^{x} mod {p}")
+for l in langkah_s:
+    print("  ", l)
+print("Nilai s =", s)
+
+# s inverse mod p
+s_inv = pow(s, -1, p)
+print(f"\ns⁻¹ = invers dari {s} mod {p} = {s_inv}")
+
+# m = b × s⁻¹ mod p
+m_dekripsi = (b * s_inv) % p
+print(f"\nPesan hasil dekripsi:")
+print(f"m = {b} × {s_inv} mod {p} = {m_dekripsi}")
+
+# ----------------------------------
+# HASIL AKHIR
+# ----------------------------------
+print("\n=== HASIL AKHIR ===")
+print("Pesan asli     :", m)
+print("Pesan dekripsi :", m_dekripsi)
